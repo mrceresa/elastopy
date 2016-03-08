@@ -1,7 +1,5 @@
-__author__ = 'Nasser'
-
 import numpy as np
-import elflab.elasticity2d
+import elastopy.elasticity2d
 
 meshName = 'patch'
 
@@ -25,7 +23,7 @@ def displacement_imposed(x1, x2):
 
     }
 
-elflab.elasticity2d.solver(meshName,
+elastopy.elasticity2d.solver(meshName,
                     material,
                     body_forces,
                     traction_imposed,

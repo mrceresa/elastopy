@@ -1,7 +1,7 @@
 __author__ = 'Nasser'
 
 import numpy as np
-import elasticity2d
+from elastopy import elasticity2d
 
 meshName = 'barragem3'
 

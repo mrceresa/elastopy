@@ -1,15 +1,15 @@
 __author__ = 'Nasser'
-
 import numpy as np
 from scipy.sparse.linalg import spsolve
 from scipy import sparse
 import matplotlib.pyplot as plt
-import elflab.gmsh as gmsh
-import elflab.element2dof as element2dof
-import elflab.assemble2dof as assemble2dof
-import elflab.plotter as plotter
-import elflab.boundaryconditions2dof as boundaryconditions2dof
-import elflab.processing as processing
+import elastopy.gmsh as gmsh
+import elastopy.element2dof as element2dof
+import elastopy.assemble2dof as assemble2dof
+import elastopy.plotter as plotter
+import elastopy.boundaryconditions2dof as boundaryconditions2dof
+import elastopy.processing as processing
+
 
 def solver(meshName, material, body_forces, traction_imposed,
            displacement_imposed,
@@ -52,7 +52,6 @@ def solver(meshName, material, body_forces, traction_imposed,
 
     sNode, sEle, eEle = processing.stress_recovery_simple2(mesh, U, matDic,
                                                            ele.e0)
-    print(mesh.num_ele)
     if printReport['stress'] == True:
         processing.print_ele_values(sEle, mesh, 'Stress')
 
@@ -68,7 +67,7 @@ def solver(meshName, material, body_forces, traction_imposed,
     #PLOTTER CONTOUR MAPS
     if plotStress['s11'] == True:
         plotter.tricontourf(sNode[0]/10**3, mesh,
-                                 'Stress 11 (kPa)','spring', dpi)
+                            'Stress 11 (kPa)','spring', dpi)
 
     if plotStress['s22'] == True:
         plotter.tricontourf(sNode[1]/10**3, mesh,

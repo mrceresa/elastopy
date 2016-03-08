@@ -73,7 +73,7 @@ class parse:
 
     """
     def __init__(self, filename):
-        path = os.path.join("..\mesh", filename+'.geo')
+        path = os.path.join(filename+'.geo')
         geometry_feeder = open(path, 'r')
 
         surfaces = []
@@ -164,7 +164,7 @@ class parse:
         self.surfaces = np.asarray(surfaces)
 
 
-        path2 = os.path.join("..\mesh", filename+'.msh')
+        path2 = os.path.join(filename+'.msh')
         mesh_feeder = open(path2, 'r')
 
         nodes_coord = []

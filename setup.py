@@ -1,13 +1,13 @@
 from setuptools import setup
 
-setup(name='poisson',
+setup(name='elastopy',
       version='0.1',
-      description='Poisson equation solver',
+      description='Stead state linear elasticity problem',
       url='nasseralkmim.github.io',
       author='Nasser Alkmim',
       author_email='nasser.alkmim@gmail.com',
       license='MIT',
-      packages=['poisson'],
+      packages=['elastopy'],
       install_requires=[
           'numpy',
           'matplotlib',

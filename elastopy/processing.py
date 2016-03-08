@@ -1,7 +1,7 @@
 __author__ = 'Nasser'
 import numpy as np
-import elflab.assemble1dof as assemble1dof
-import elflab.assemble2dof as assemble2dof
+import elastopy.assemble1dof as assemble1dof
+import elastopy.assemble2dof as assemble2dof
 
 def stress_recovery_gauss(mesh, d, C):
     """

@@ -1,6 +1,6 @@
 __author__ = 'Nasser'
 import numpy as np
-import elflab.assemble2dof as assemble2dof
+import elastopy.assemble2dof as assemble2dof
 from scipy import sparse
 import math
 from numba import jit
