@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 
-class parse:
+class Parse:
     """Produce mesh with gmsh file.
 
     .. note ::
