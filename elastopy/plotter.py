@@ -77,7 +77,7 @@ def stress(mesh, sNode, ftr=1, s11=False, s12=False, s22=False, spmax=False,
 
     if s22 is True:
         ax.set_title(r'Stress 22 ('+str(ftr)+' Pa)')
-        draw.tricontourf(mesh, sNode[1]/ftr, ax, 'hsv', lev=lev)
+        draw.tricontourf(mesh, sNode[1]/ftr, ax, 'summer', lev=lev)
 
     if spmax is True:
         spmx = processing.principal_stress_max(sNode[0], sNode[1], sNode[2])
