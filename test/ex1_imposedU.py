@@ -9,7 +9,7 @@ mesh_name = 'patch'
 model = gmsh.Parse(mesh_name)
 
 material = {'E-nu': [1000.0, 0.3]}
-a = 2
+
 
 def body_forces(x1, x2):
     return np.array([0.0, -10.0])

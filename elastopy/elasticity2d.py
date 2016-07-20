@@ -4,40 +4,35 @@ import elastopy.element2dof as element2dof
 import elastopy.assemble2dof as assemble2dof
 import elastopy.boundaryconditions2dof as boundaryconditions2dof
 import elastopy.processing as processing
+from elastopy import stiffness
 
 
-def solver(mesh, material, body_forces, traction_imposed,
+def solver(model, material, body_forces, traction_imposed,
            displacement_imposed, **kwargs):
 
-    ele = element2dof.Matrices(mesh)
+    K = stiffness.K_matrix(model, material)
 
-    s = mesh.surfaces
-    matDic = {s[i]: material[j] for i, j in enumerate(material)}
+    return None, None
+    # ele.body_forces(body_forces)
 
-    ele.stiffness(matDic)
+    # ele.initial_strain(kwargs)
 
-    ele.body_forces(body_forces)
+    # P0q = assemble2dof.globalVector(ele.P0q, model)
 
-    ele.initial_strain(kwargs)
+    # P0t = boundaryconditions2dof.neumann(model, traction_imposed)
 
-    K = assemble2dof.globalMatrix(ele.K, mesh)
+    # P0e = assemble2dof.globalVector(ele.P0e, model)
 
-    P0q = assemble2dof.globalVector(ele.P0q, mesh)
+    # P0 = P0q + P0t + P0e
 
-    P0t = boundaryconditions2dof.neumann(mesh, traction_imposed)
+    # Km, P0m = boundaryconditions2dof.dirichlet(K, P0, model,
+    #                                            displacement_imposed)
 
-    P0e = assemble2dof.globalVector(ele.P0e, mesh)
+    # Ks = sparse.csc_matrix(Km)
 
-    P0 = P0q + P0t + P0e
+    # U = spsolve(Ks, P0m)
 
-    Km, P0m = boundaryconditions2dof.dirichlet(K, P0, mesh,
-                                               displacement_imposed)
+    # sNode, sEle, eEle = processing.stress_recovery_simple2(model, U, matDic,
+    #                                                        ele.e0)
 
-    Ks = sparse.csc_matrix(Km)
-
-    U = spsolve(Ks, P0m)
-
-    sNode, sEle, eEle = processing.stress_recovery_simple2(mesh, U, matDic,
-                                                           ele.e0)
-
-    return U, sNode
+    # return U, sNode
