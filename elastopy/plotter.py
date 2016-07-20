@@ -38,7 +38,8 @@ def model(mesh, name=None, color='k', dpi=100, ele=False, ele_label=False,
     return None
 
 
-def model_deformed(mesh, U, magf=1, ele=False, name=None, color='Tomato', dpi=100):
+def model_deformed(mesh, U, magf=1, ele=False, name=None, color='Tomato',
+                   dpi=100):
     """Plot deformed model
 
     """

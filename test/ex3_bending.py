@@ -36,9 +36,9 @@ def displacement_imposed(x1, x2):
 U, sNode = elasticity2d.solver(mesh, material, body_forces,
                                traction_imposed, displacement_imposed)
 
-# plotter.model(mesh)
-# plotter.model_deformed(mesh, U, magf=0.1)
 plotter.stress(mesh, sNode, spmin=True)
 plotter.stress(mesh, sNode, spmax=True)
+plotter.stress(mesh, sNode, s11=True)
+plotter.model(mesh, ele=True, edges_label=True)
+plotter.model_deformed(mesh, U, magf=0.1)
 plotter.show()
-

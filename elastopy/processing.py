@@ -1,7 +1,7 @@
-__author__ = 'Nasser'
 import numpy as np
 import elastopy.assemble1dof as assemble1dof
 import elastopy.assemble2dof as assemble2dof
+
 
 def stress_recovery_gauss(mesh, d, C):
     """
@@ -81,7 +81,7 @@ def principal_stress_max(s11, s22, s12):
     sp_max = np.zeros(len(s11))
     for i in range(len(s11)):
         sp_max[i] = (s11[i]+s22[i])/2.0 + np.sqrt((s11[i] - s22[i])**2.0/2.0 +
-                                               s12[i]**2.0)
+                                                  s12[i]**2.0)
 
     return sp_max
 
@@ -433,13 +433,12 @@ def join_dof_values(de, df, ide, idf):
 def linear_elastic_constitutive(mat):
     E = mat[0]
     nu = mat[1]
-    C = np.zeros((3,3))
+    C = np.zeros((3, 3))
     C[0, 0] = 1.0
     C[1, 1] = 1.0
     C[1, 0] = nu
     C[0, 1] = nu
-    C[2, 2] = (1.0 - nu)/2.0
-    C = (E/(1.0-nu**2.0))*C
+    C[2, 2] = (1.0 - nu) / 2.0
+    C = (E / (1.0 - nu**2.0)) * C
     return C
-
 

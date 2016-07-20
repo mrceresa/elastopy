@@ -44,5 +44,6 @@ U, sNode = elasticity2d.solver(mesh, material, body_forces,
 plotter.stress(mesh, sNode, spmin=True, ftr=1000)
 plotter.stress(mesh, sNode, spmax=True, ftr=1000)
 plotter.model(mesh, edges_label=True, surf_label=True)
+plotter.model(mesh, ele=True)
 plotter.model_deformed(mesh, U, magf=1000)
 plotter.show()

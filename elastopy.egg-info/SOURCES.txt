@@ -3,6 +3,7 @@ elastopy/__init__.py
 elastopy/assemble1dof.py
 elastopy/assemble2dof.py
 elastopy/boundaryconditions2dof.py
+elastopy/draw.py
 elastopy/elasticity2d.py
 elastopy/element2dof.py
 elastopy/gmsh.py

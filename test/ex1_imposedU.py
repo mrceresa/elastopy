@@ -2,11 +2,11 @@ import numpy as np
 from elastopy import elasticity2d
 from elastopy import gmsh
 from elastopy import plotter
+from elastopy import data
 
+mesh_name = 'patch'
 
-meshName = 'patch'
-
-mesh = gmsh.Parse(meshName)
+model = gmsh.Parse(mesh_name)
 
 material = {'E-nu': [1000.0, 0.3]}
 
@@ -27,11 +27,10 @@ def displacement_imposed(x1, x2):
     }
 
 
-U, sNode = elasticity2d.solver(mesh, material, body_forces,
+U, sNode = elasticity2d.solver(model, material, body_forces,
                                traction_imposed, displacement_imposed)
 
-# plotter.model(mesh)
-# plotter.model_deformed(mesh, U, magf=0.1)
-plotter.stress(mesh, sNode, spmin=True)
-plotter.stress(mesh, sNode, spmax=True)
+plotter.model(model)
+plotter.model_deformed(model, U, magf=0.1)
+
 plotter.show()

@@ -2,7 +2,6 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import networkx as nx
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def elements_label(mesh, ax):
@@ -387,3 +386,4 @@ def tricontourf(mesh, sNode, ax, cmap, lev):
     ax.plot(ccx, ccy, '-k')
 
     plt.colorbar(CS2)
+

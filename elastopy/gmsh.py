@@ -1,5 +1,14 @@
 import numpy as np
 import os
+import re
+
+
+def find_num(string):
+    """Find all numbers in a string
+
+    """
+    num = re.findall(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)', string)
+    return num
 
 
 class Parse:
@@ -207,8 +216,8 @@ class Parse:
         self.num_ele = len(self.ele_conn[:, 0])
         self.num_nodes = len(self.nodes_coord[:, 0])
 
-        boundary_elements = []
 
+        boundary_elements = []
         for ele in range(len(self.ele_conn[:, 0])):
             for no in range(len(self.boundary_nodes[:, 0])):
                 if np.all(self.boundary_nodes[no, 1:3] == self.ele_conn[ele,
