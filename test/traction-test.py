@@ -4,7 +4,7 @@ from elastopy import gmsh
 from elastopy import plotter
 from elastopy import data
 
-mesh_name = 'patch'
+mesh_name = 'patch2_2'
 
 model = gmsh.Parse(mesh_name)
 
@@ -22,7 +22,6 @@ def body_forces(x1, x2, t=1):
 
 def traction_imposed(x1, x2, t=1):
     return {
-        ('line', 3): [-1.0, 0.0],
         ('line', 1): [1.0, 0.0]}
 
 
@@ -34,8 +33,8 @@ def displacement_imposed(x1, x2):
 U, sNode = elasticity2d.solver(model, material, body_forces,
                                traction_imposed, displacement_imposed)
 
-plotter.model(model, ele=True, nodes_label=True,
-              ele_label=True, edges_label=True)
+# plotter.model(model, ele=True, nodes_label=True,
+#               ele_label=True, edges_label=True)
 # plotter.model_deformed(model, U, magf=100, ele=True)
 
-plotter.show()
+# plotter.show()

@@ -55,7 +55,7 @@ class Parse:
 
         msh_path = os.path.join(filename+'.msh')
         msh_file = open(msh_path, 'r')
-
+        
         # node_tag: [node1 node2]
         XYZ = {}
         # element_tag: [node1_tag node2_tag node3_tag node4_tag]
@@ -84,6 +84,7 @@ class Parse:
                 nl = [int(f) - 1 for f in num_list[4:]]
                 self.nodes_in_bound_line.append([nl[0],  nl[1], nl[2]])
 
+        self.nodes_in_bound_line = np.array(self.nodes_in_bound_line)
         self.XYZ = np.array(list(XYZ.values()))
         self.CONN = np.array(list(CONN.values()))
         self.ne = len(CONN)
@@ -93,11 +94,14 @@ class Parse:
         #        [dof1_e2, dof2_e2, ... dof8_e2]]
         DOF = []
         for e, conn in enumerate(self.CONN):
-            DOF.append([conn[0], conn[0]+1,
-                        conn[1], conn[1]+1,
-                        conn[2], conn[2]+1,
-                        conn[3], conn[3]+1])
+            DOF.append([2 * conn[0], 2 * conn[0] + 1,
+                        2 * conn[1], 2 * conn[1] + 1,
+                        2 * conn[2], 2 * conn[2] + 1,
+                        2 * conn[3], 2 * conn[3] + 1])
         self.DOF = np.array(DOF)
+
+        # Number of total degree of freedom
+        self.ndof = len(DOF[0])*self.ne
 
         # Nodal coordinates in the natural domain
         self.chi = np.array([[-1.0, -1.0],
@@ -123,6 +127,7 @@ class Parse:
                     bound_ele.append([e, 3, l])
 
         self.bound_ele = np.array(bound_ele)
+        self.gmsh = 1.0
 
     def basis_function(self, natural_coord):
         """Create the basis function and its properties.

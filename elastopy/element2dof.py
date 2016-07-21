@@ -314,7 +314,7 @@ class Matrices:
                         [-1.0, 1.0/math.sqrt(3)]]])
 
         # compute traction for all nodes
-        for l in traction(1,1).keys():
+        for l in traction(1, 1).keys():
             if l[0] == 'line':
                 for e, side, line in mesh.boundary_elements:
                     if line == l[1]:

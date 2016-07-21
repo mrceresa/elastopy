@@ -5,21 +5,28 @@ import elastopy.assemble2dof as assemble2dof
 import elastopy.boundaryconditions2dof as boundaryconditions2dof
 import elastopy.processing as processing
 from elastopy import stiffness
+from elastopy import load
+from elastopy import traction
+import numpy as np
 
 
-def solver(model, material, body_forces, traction_imposed,
+def solver(model, material, b_force, trac,
            displacement_imposed, **kwargs):
 
     K = stiffness.K_matrix(model, material)
 
+    Pb = load.Pb_vector(model, b_force)
+
+    Pt = traction.Pt_vector(model, trac)
+
     return None, None
-    # ele.body_forces(body_forces)
+    # ele.b_force(b_force)
 
     # ele.initial_strain(kwargs)
 
     # P0q = assemble2dof.globalVector(ele.P0q, model)
 
-    # P0t = boundaryconditions2dof.neumann(model, traction_imposed)
+    # P0t = boundaryconditions2dof.neumann(model, trac)
 
     # P0e = assemble2dof.globalVector(ele.P0e, model)
 

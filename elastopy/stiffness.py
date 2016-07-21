@@ -5,7 +5,7 @@ def K_matrix(model, material):
     """Build the global stiffness matrix
 
     """
-    K = np.zeros((2*model.nn, 2*model.nn))
+    K = np.zeros((model.ndof, model.ndof))
     for e, conn in enumerate(model.CONN):
         xyz = model.XYZ[conn]
         surf = model.surf_of_ele[e]
