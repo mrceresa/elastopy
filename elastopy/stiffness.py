@@ -1,11 +1,12 @@
 import numpy as np
 
 
-def K_matrix(model, material):
+def K_matrix(model, material, t=1):
     """Build the global stiffness matrix
 
     """
     K = np.zeros((model.ndof, model.ndof))
+
     for e, conn in enumerate(model.CONN):
         xyz = model.XYZ[conn]
         surf = model.surf_of_ele[e]
@@ -20,7 +21,7 @@ def K_matrix(model, material):
             E = 1.0
             nu = 0.1
 
-        k = k_matrix(model, xyz, E, nu)
+        k = k_matrix(model, xyz, E, nu, t)
 
         id = np.ix_(dof, dof)
 
@@ -29,19 +30,20 @@ def K_matrix(model, material):
     return K
 
 
-def k_matrix(model, xyz, E, nu):
+def k_matrix(model, xyz, E, nu, t=1):
     """Build the element stiffness matrix
 
     """
     gauss_points = model.chi / np.sqrt(3.0)
 
+    C = c_matrix(E, nu)
+
     k = np.zeros((8, 8))
+
     for gp in gauss_points:
         model.basis_function(gp)
         model.jacobian(xyz)
         dJ = model.detJac
-
-        C = c_matrix(E, nu)
 
         dp_xi = model.dphi_xi
         B = np.array([

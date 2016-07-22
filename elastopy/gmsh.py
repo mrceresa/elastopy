@@ -101,7 +101,7 @@ class Parse:
         self.DOF = np.array(DOF)
 
         # Number of total degree of freedom
-        self.ndof = len(DOF[0])*self.ne
+        self.ndof = 2*self.nn
 
         # Nodal coordinates in the natural domain
         self.chi = np.array([[-1.0, -1.0],

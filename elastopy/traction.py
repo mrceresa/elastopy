@@ -22,7 +22,6 @@ def Pt_vector(model, trac, t=1):
                 id = dof
 
                 Pt[id] += pt
-    print(Pt)
     return Pt
 
 

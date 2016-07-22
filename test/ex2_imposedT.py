@@ -14,28 +14,26 @@ material.E[9] = 1000
 material.nu[9] = 0.3
 
 
-def body_forces(x1, x2, t=1):
-    return np.array([
-        0.0,
-        0.0])
+def b_force(x1, x2, t=1):
+    return np.array([0.0,
+                     0.0])
 
 
-def traction_imposed(x1, x2, t=1):
+def trac_bc(x1, x2, t=1):
     return {
         ('line', 3): [-1.0, 0.0],
         ('line', 1): [1.0, 0.0]}
 
 
-def displacement_imposed(x1, x2):
-    return {
-        ('node', 0): [0.0, 0.0],
-        ('node', 1): ['free', 0.0]}
+def displ_bc(x1, x2):
+    return {('node', 0): [0.0, 0.0],
+            ('node', 1): ['free', 0.0]}
 
-U, sNode = elasticity2d.solver(model, material, body_forces,
-                               traction_imposed, displacement_imposed)
-
+U, SIG = elasticity2d.solver(model, material, b_force,
+                             trac_bc, displ_bc)
+print(SIG[:, 0])
 plotter.model(model, ele=True, nodes_label=True,
               ele_label=True, edges_label=True)
-# plotter.model_deformed(model, U, magf=100, ele=True)
+plotter.model_deformed(model, U, magf=100, ele=True)
 
 plotter.show()
