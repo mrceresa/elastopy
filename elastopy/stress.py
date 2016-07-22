@@ -26,7 +26,7 @@ def recovery(model, material, U, EPS0=0):
         u = U[dof]
 
         for n, xez in enumerate(model.chi):
-            model.basis_function(xez)
+            model.basis_function(xez/np.sqrt(3))
 
             # number of elements sharing a node
             num_ele_shrg = (model.CONN == conn[n]).sum()
