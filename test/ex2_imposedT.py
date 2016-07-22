@@ -31,10 +31,10 @@ def displ_bc(x1, x2):
 
 U, SIG = elasticity2d.solver(model, material, b_force,
                              trac_bc, displ_bc)
-print(SIG)
 
 plotter.model(model, ele=True, nodes_label=True,
               ele_label=True, edges_label=True)
 plotter.model_deformed(model, U, magf=100, ele=True)
+
 
 plotter.show()

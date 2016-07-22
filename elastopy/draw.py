@@ -352,7 +352,7 @@ def draw_bc_neumann_value(traction, model, name, dpi):
                                                  headwidth=5, shrink=0.1))
 
 
-def tricontourf(model, sNode, ax, cmap, lev):
+def tricontourf(model, SIG, ax, cmap, lev):
     """Plot contour with the tricoutour function and the boundary line with
     the boundary node.
 
@@ -361,7 +361,7 @@ def tricontourf(model, sNode, ax, cmap, lev):
 
     bn = model.nodes_in_bound_line
 
-    xx, yy, zz = c[:, 0], c[:, 1], sNode
+    xx, yy, zz = c[:, 0], c[:, 1],  SIG
 
     ccx = np.append(c[bn[:, 1], 0], c[bn[0, 1], 0])
     ccy = np.append(c[bn[:, 1], 1], c[bn[0, 1], 1])
@@ -386,4 +386,3 @@ def tricontourf(model, sNode, ax, cmap, lev):
     ax.plot(ccx, ccy, '-k')
 
     plt.colorbar(CS2)
-

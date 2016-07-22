@@ -10,7 +10,7 @@ def Pb_vector(model, b_force, t=1):
     for e, conn in enumerate(model.CONN):
         xyz = model.XYZ[conn]
         dof = model.DOF[e]
-        
+
         pb = pb_vector(model, xyz, b_force, t)
 
         id = dof
@@ -69,8 +69,8 @@ def Pe_vector(model, material, EPS0, t=1):
             E = 1.0
             nu = 0.1
 
-        eps0 = EPS0[e] 
-            
+        eps0 = EPS0[e]
+
         pe = pe_vector(model, xyz, E, nu, eps0, t)
 
         id = dof

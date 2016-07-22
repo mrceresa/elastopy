@@ -8,14 +8,19 @@ mesh_name = 'patch'
 
 model = gmsh.Parse(mesh_name)
 
-material = {'E-nu': [1000.0, 0.3]}
+
+material = data.Collect()
+s = list(model.surf.keys())
+
+material.E[s[0]] = 1000
+material.nu[s[0]] = 0.3
 
 
-def body_forces(x1, x2):
-    return np.array([0.0, -10.0])
+def body_forces(x1, x2, t=1):
+    return np.array([0.0, 0.0])
 
 
-def traction_imposed(x1, x2):
+def traction_imposed(x1, x2, t=1):
     return {}
 
 
@@ -27,8 +32,8 @@ def displacement_imposed(x1, x2):
     }
 
 
-U, sNode = elasticity2d.solver(model, material, body_forces,
-                               traction_imposed, displacement_imposed)
+U, SIG = elasticity2d.solver(model, material, body_forces,
+                             traction_imposed, displacement_imposed)
 
 plotter.model(model)
 plotter.model_deformed(model, U, magf=0.1)
