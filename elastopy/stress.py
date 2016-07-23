@@ -33,7 +33,7 @@ def recovery(model, material, U, EPS0):
         u = U[dof]
 
         for n, xez in enumerate(model.chi):
-            model.basis_function(xez/np.sqrt(3.0))
+            model.basis_function(xez)
             model.jacobian(xyz)
 
             # number of elements sharing a node
@@ -47,7 +47,7 @@ def recovery(model, material, U, EPS0):
                  dp_xi[1, 3]],
                 [dp_xi[1, 0], dp_xi[0, 0], dp_xi[1, 1], dp_xi[0, 1],
                  dp_xi[1, 2], dp_xi[0, 2], dp_xi[1, 3], dp_xi[0, 3]]])
-            print("B", B, "nó", n, "ele", e)
+
             # sig = [sig_11 sig_22 sig_12] for each n node
             sig = C @ (B @ u - eps0)
 
