@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from elastopy import draw
 from elastopy import processing
-
+from elastopy import stress
 
 def show():
     plt.show()
@@ -57,8 +57,8 @@ def model_deformed(model, U, magf=1, ele=False, name=None, color='Tomato',
     draw.deformed_domain(model, U, ax, magf=magf, color=color)
 
 
-def stress(model, SIG, ftr=1, s11=False, s12=False, s22=False, spmax=False,
-           spmin=False, dpi=100, name=None, lev=20):
+def stresses(model, SIG, ftr=1, s11=False, s12=False, s22=False, spmax=False,
+             spmin=False, dpi=100, name=None, lev=20):
     """Plot stress with nodal stresses
 
     """
@@ -81,11 +81,11 @@ def stress(model, SIG, ftr=1, s11=False, s12=False, s22=False, spmax=False,
         draw.tricontourf(model, SIG[:, 1]/ftr, ax, 'autumn', lev=lev)
 
     if spmax is True:
-        spmx = processing.principal_stress_max(SIG[0], SIG[1], SIG[2])
+        spmx = stress.principal_max(SIG[:, 0], SIG[:, 1], SIG[:, 2])
         ax.set_title(r'Stress Principal Max ('+str(ftr)+' Pa)')
         draw.tricontourf(model, spmx/ftr, ax, 'plasma', lev=lev)
 
     if spmin is True:
-        spmn = processing.principal_stress_min(SIG[0], SIG[1], SIG[2])
+        spmn = stress.principal_min(SIG[:, 0], SIG[:, 1], SIG[:, 2])
         ax.set_title(r'Stress Principal Min ('+str(ftr)+' Pa)')
         draw.tricontourf(model, spmn/ftr, ax, 'viridis', lev=lev)

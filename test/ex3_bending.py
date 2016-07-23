@@ -2,15 +2,20 @@ import numpy as np
 from elastopy import elasticity2d
 from elastopy import gmsh
 from elastopy import plotter
+from elastopy import data
 
 meshName = 'patch5'
 
-mesh = gmsh.Parse(meshName)
+model = gmsh.Parse(meshName)
 
-material = {'E-nu': [1000.0, 0.3]}
+material = data.Collect()
+s = list(model.surf.keys())
+
+material.E[s[0]] = 1000
+material.nu[s[0]] = 0.3
 
 
-def body_forces(x1, x2):
+def b_force(x1, x2, t=1):
     return np.array([
         0.0,
         0.0,
@@ -21,24 +26,24 @@ M = 10.0
 h = 0.5
 
 
-def traction_imposed(x1, x2):
+def trac_bc(x1, x2, t=1):
     return {
         ('line', 1): [M*(x2-h)/I, 0.0]
     }
 
 
-def displacement_imposed(x1, x2):
+def displ_bc(x1, x2):
     return {
         ('line', 3): [0.0, 0.0]
 
     }
 
-U, sNode = elasticity2d.solver(mesh, material, body_forces,
-                               traction_imposed, displacement_imposed)
+U, SIG = elasticity2d.solver(model, material, b_force,
+                             trac_bc, displ_bc)
 
-plotter.stress(mesh, sNode, spmin=True)
-plotter.stress(mesh, sNode, spmax=True)
-plotter.stress(mesh, sNode, s11=True)
-plotter.model(mesh, ele=True, edges_label=True)
-plotter.model_deformed(mesh, U, magf=0.1)
+plotter.stresses(model, SIG, spmin=True)
+plotter.stresses(model, SIG, spmax=True)
+plotter.stresses(model, SIG, s11=True)
+plotter.model(model, ele=True, edges_label=True)
+plotter.model_deformed(model, U, magf=0.1)
 plotter.show()

@@ -55,7 +55,7 @@ class Parse:
 
         msh_path = os.path.join(filename+'.msh')
         msh_file = open(msh_path, 'r')
-        
+
         # node_tag: [node1 node2]
         XYZ = {}
         # element_tag: [node1_tag node2_tag node3_tag node4_tag]

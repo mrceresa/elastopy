@@ -70,3 +70,25 @@ def c_matrix(E, nu):
     C[2, 2] = (1.0 - nu)/2.0
     C = (E/(1.0-nu**2.0))*C
     return C
+
+
+def principal_max(s11, s22, s12):
+    """Compute the principal stress max
+
+    """
+    sp_max = np.zeros(len(s11))
+    for i in range(len(s11)):
+        sp_max[i] = (s11[i] + s22[i]) / 2.0 + np.sqrt(
+            (s11[i] - s22[i])**2.0 / 2.0 + s12[i]**2.0)
+    return sp_max
+
+
+def principal_min(s11, s22, s12):
+    """Compute the principal stress minimum
+
+    """
+    sp_min = np.zeros(len(s11))
+    for i in range(len(s11)):
+        sp_min[i] = (s11[i]+s22[i])/2. - np.sqrt((s11[i] - s22[i])**2./2. +
+                                                 s12[i]**2.)
+    return sp_min
