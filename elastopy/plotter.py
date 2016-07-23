@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from elastopy import draw
-from elastopy import processing
 from elastopy import stress
+
 
 def show():
     plt.show()
