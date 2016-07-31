@@ -386,3 +386,106 @@ def tricontourf(model, sig, ax, cmap, lev):
     ax.plot(ccx, ccy, '-k')
 
     plt.colorbar(CS2)
+
+
+def tricontourf_dyn(model, sig, ax, cmap, lev, vmin=None, vmax=None):
+    """Plot contour with the tricoutour function and the boundary line with
+    the boundary node.
+
+    Return:
+    list with plot Artist
+
+    """
+    c = model.XYZ
+
+    bn = model.nodes_in_bound_line
+
+    xx, yy, zz = c[:, 0], c[:, 1],  sig
+
+    ccx = np.append(c[bn[:, 1], 0], c[bn[0, 1], 0])
+    ccy = np.append(c[bn[:, 1], 1], c[bn[0, 1], 1])
+
+    triangles = []
+    for n1, n2, n3, n4 in model.CONN:
+        triangles.append([n1, n2, n3])
+        triangles.append([n1, n3, n4])
+
+    triangles = np.asarray(triangles)
+
+    CS2 = ax.tricontourf(xx, yy, triangles, zz, lev,
+                         origin='lower',
+                         cmap=cmap, antialiased=True,
+                         vmin=vmin, vmax=vmax)
+
+    CS3 = ax.plot(ccx, ccy, '-k')
+
+    return CS2.collections + CS3
+
+
+def deformed_domain_dyn(model, U, ax, magf, color):
+    """Draw deformed domain
+
+    """
+    c = model.XYZ
+
+    bn = model.nodes_in_bound_line
+
+    adX = U[::2]
+    adY = U[1::2]
+
+    dX, dY = (c[bn[:, 1], 0] + adX[bn[:, 1]]*magf,
+              c[bn[:, 1], 1] + adY[bn[:, 1]]*magf)
+
+    G2 = nx.Graph()
+
+    label2 = []
+    for i in range(len(dX)):
+        label2.append(i)
+        G2.add_node(i, posxy2=(dX[i], dY[i]))
+
+    for i in range(len(bn[:, 0]) - 1):
+        G2.add_edge(i, i+1)
+
+    G2.add_edge(len(bn[:, 0]) - 1, 0)
+
+    positions2 = nx.get_node_attributes(G2, 'posxy2')
+
+    im = nx.draw_networkx_edges(G2, positions2, node_size=0, edge_color=color,
+                                font_size=0, width=1, ax=ax)
+
+    return im
+
+
+def deformed_elements_dyn(model, U, ax, magf, color):
+    """Draw deformed elements
+
+    """
+    c = model.XYZ
+
+    dX, dY = c[:, 0] + U[::2]*magf, c[:, 1] + U[1::2]*magf
+
+    G2 = nx.Graph()
+
+    if model.gmsh == 1.0:
+        temp = np.copy(model.CONN[:, 2])
+        model.CONN[:, 2] = model.CONN[:, 3]
+        model.CONN[:, 3] = temp
+        model.gmsh += 1.0
+
+    label2 = []
+    for i in range(len(dX)):
+        label2.append(i)
+        G2.add_node(i, posxy2=(dX[i], dY[i]))
+
+    for i in range(len(model.CONN)):
+        G2.add_cycle([model.CONN[i, 0],
+                     model.CONN[i, 1],
+                     model.CONN[i, 3],
+                     model.CONN[i, 2]], )
+
+    positions2 = nx.get_node_attributes(G2, 'posxy2')
+
+    im = nx.draw_networkx_edges(G2, positions2, edge_color=color,
+                                font_size=0, width=1, ax=ax)
+
+    return im

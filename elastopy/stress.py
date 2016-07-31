@@ -52,7 +52,7 @@ def recovery(model, material, U, EPS0):
             sig = C @ (B @ u - eps0)
 
             # dof 1 degree of freedom per node
-            d = dof[2*n]/2
+            d = int(dof[2*n]/2)
 
             # unweighted average of stress at nodes
             SIG[d, :] += sig/num_ele_shrg

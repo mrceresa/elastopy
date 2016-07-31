@@ -1,10 +1,21 @@
 import matplotlib.pyplot as plt
 from elastopy import draw
 from elastopy import stress
+import matplotlib.animation as animation
+import numpy as np
 
 
 def show():
     plt.show()
+
+
+def initiate(aspect='equal', axis='off'):
+    fig = plt.figure()
+    ax = fig.add_axes([.1, .1, .8, .8])
+    ax.set_aspect(aspect)
+    if axis == 'off':
+        ax.set_axis_off()
+    return fig, ax
 
 
 def model(model, name=None, color='k', dpi=100, ele=False, ele_label=False,
@@ -70,22 +81,81 @@ def stresses(model, SIG, ftr=1, s11=False, s12=False, s22=False, spmax=False,
 
     if s11 is True:
         ax.set_title(r'Stress 11 ('+str(ftr)+' Pa)')
-        draw.tricontourf(model, SIG[:, 0]/ftr, ax, 'spring', lev=lev)
+        draw.tricontourf_dyn(model, SIG[:, 0]/ftr, ax, 'spring', lev=lev)
 
     if s12 is True:
         ax.set_title(r'Stress 12 ('+str(ftr)+' Pa)')
-        draw.tricontourf(model, SIG[:, 2]/ftr, ax, 'cool', lev=lev)
+        draw.tricontourf_dyn(model, SIG[:, 2]/ftr, ax, 'cool', lev=lev)
 
     if s22 is True:
         ax.set_title(r'Stress 22 ('+str(ftr)+' Pa)')
-        draw.tricontourf(model, SIG[:, 1]/ftr, ax, 'autumn', lev=lev)
+        draw.tricontourf_dyn(model, SIG[:, 1]/ftr, ax, 'autumn', lev=lev)
 
     if spmax is True:
         spmx = stress.principal_max(SIG[:, 0], SIG[:, 1], SIG[:, 2])
         ax.set_title(r'Stress Principal Max ('+str(ftr)+' Pa)')
-        draw.tricontourf(model, spmx/ftr, ax, 'plasma', lev=lev)
+        draw.tricontourf_dyn(model, spmx/ftr, ax, 'plasma', lev=lev)
 
     if spmin is True:
         spmn = stress.principal_min(SIG[:, 0], SIG[:, 1], SIG[:, 2])
         ax.set_title(r'Stress Principal Min ('+str(ftr)+' Pa)')
-        draw.tricontourf(model, spmn/ftr, ax, 'viridis', lev=lev)
+        draw.tricontourf_dyn(model, spmn/ftr, ax, 'viridis', lev=lev)
+
+
+def model_deformed_dyn(model, U, ax, magf=1, ele=False, name=None,
+                       color='Tomato',
+                       dpi=100):
+    """Plot deformed model
+
+    """
+    if ele is True:
+        im = draw.deformed_elements_dyn(model, U, ax, magf=magf, color=color)
+    else:
+        im = draw.deformed_domain_dyn(model, U, ax, magf=magf,
+                                      color=color)
+    return im
+
+
+def anime(frames, fig, t_int):
+    """Plot animation with images frames
+
+    """
+    ani = animation.ArtistAnimation(fig, frames, interval=100,
+                                    blit=True)
+    return ani
+
+
+def stresses_dyn(model, SIG, ax, ftr=1, s11=False, s12=False, s22=False,
+                 spmax=False, spmin=False, dpi=100, name=None,
+                 lev=20, vmin=None, vmax=None):
+    """Plot stress with nodal stresses
+
+    Return:
+    im = list with matplotlib Artist
+
+    """
+    if s11 is True:
+        ax.set_title(r'Stress 11 ('+str(ftr)+' Pa)')
+        im = draw.tricontourf_dyn(model, SIG[:, 0]/ftr, ax, 'spring', lev=lev)
+
+    if s12 is True:
+        ax.set_title(r'Stress 12 ('+str(ftr)+' Pa)')
+        im = draw.tricontourf_dyn(model, SIG[:, 2]/ftr, ax, 'cool', lev=lev)
+
+    if s22 is True:
+        ax.set_title(r'Stress 22 ('+str(ftr)+' Pa)')
+        im = draw.tricontourf_dyn(model, SIG[:, 1]/ftr, ax, 'autumn', lev=lev)
+
+    if spmax is True:
+        spmx = stress.principal_max(SIG[:, 0], SIG[:, 1], SIG[:, 2])
+        s_range = [np.amin(spmx), np.amax(spmx)]
+        ax.set_title(r'Stress Principal Max ('+str(ftr)+' Pa)')
+        im = draw.tricontourf_dyn(model, spmx/ftr, ax, 'plasma', lev=lev, vmin=vmin, vmax=vmax)
+
+    if spmin is True:
+        spmn = stress.principal_min(SIG[:, 0], SIG[:, 1], SIG[:, 2])
+        s_range = [np.amin(spmn), np.amax(spmn)]
+        ax.set_title(r'Stress Principal Min ('+str(ftr)+' Pa)')
+        im = draw.tricontourf_dyn(model, spmn/ftr, ax, 'viridis', lev=lev)
+
+    return im, s_range

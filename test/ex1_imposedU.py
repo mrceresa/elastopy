@@ -1,5 +1,5 @@
 import numpy as np
-from elastopy import elasticity2d
+from elastopy import statics
 from elastopy import gmsh
 from elastopy import plotter
 from elastopy import data
@@ -32,8 +32,8 @@ def displacement_imposed(x1, x2):
     }
 
 
-U, SIG = elasticity2d.solver(model, material, body_forces,
-                             traction_imposed, displacement_imposed)
+U, SIG = statics.solver(model, material, body_forces,
+                        traction_imposed, displacement_imposed)
 
 plotter.model(model)
 plotter.model_deformed(model, U, magf=0.1)
