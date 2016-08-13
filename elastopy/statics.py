@@ -10,8 +10,10 @@ def solver(model, material, b_force, trac_bc, displ_bc, EPS0=0, t=1):
     """Solver for the elastostatics problem
 
     Return:
+
     U: displacement solution of the boundary value problem
     SIG: stresses response of the system under the boundary conditions
+
     """
     K = stiffness.K_matrix(model, material, t)
 

@@ -7,6 +7,11 @@ def Pb_vector(model, b_force, t=1):
     """
     Pb = np.zeros(model.ndof)
 
+    try:
+        b_force(1, 1, 1)
+    except:
+        print("No body force applied!")
+
     for e, conn in enumerate(model.CONN):
         xyz = model.XYZ[conn]
         dof = model.DOF[e]

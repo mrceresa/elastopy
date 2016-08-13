@@ -45,7 +45,7 @@ def surface_label(model, ax):
     for surface, lpTag in model.physical_surf.items():
         xm = 0.0
         ym = 0.0
-        for node in model.lineLoop[lpTag]:
+        for node in model.line_loop[lpTag]:
             G2.add_edge(model.line[node][0],
                         model.line[node][1])
             xm += (model.XYZ[model.line[node][0], 0] +
@@ -53,9 +53,10 @@ def surface_label(model, ax):
             ym += (model.XYZ[model.line[node][0], 1] +
                    model.XYZ[model.line[node][1], 1])
 
-        xs, ys = xm/(2*len(model.lineLoop[lpTag])), ym/(2*len(model.lineLoop[
+        xs, ys = xm/(2*len(model.line_loop[lpTag])), ym/(2*len(model.line_loop[
                                                                  lpTag]))
-        ax.annotate(str(i), (xs, ys), size=9, color='g')
+        sf = model.physical_surf[surface]
+        ax.annotate(str(sf), (xs, ys), size=9, color='g')
         i += 1
 
 
@@ -352,7 +353,7 @@ def draw_bc_neumann_value(traction, model, name, dpi):
                                                  headwidth=5, shrink=0.1))
 
 
-def tricontourf(model, sig, ax, cmap, lev):
+def tricontourf(model, sig, ax, cmap, lev, vmin=None, vmax=None):
     """Plot contour with the tricoutour function and the boundary line with
     the boundary node.
 
@@ -375,17 +376,22 @@ def tricontourf(model, sig, ax, cmap, lev):
 
     CS2 = ax.tricontourf(xx, yy, triangles, zz, lev,
                          origin='lower',
-                         cmap=cmap, antialiased=True)
+                         cmap=cmap, antialiased=True,
+                         vmin=vmin, vmax=vmax)
 
     CS3 = ax.tricontour(xx, yy, triangles, zz, lev, colors='black')
     ax.clabel(CS3, fontsize=8, colors='k', fmt='%1.1f')
 
-    ax.patch.set_visible(False)
-    ax.axis('off')
-
     ax.plot(ccx, ccy, '-k')
 
-    plt.colorbar(CS2)
+    # # Change the colorbar range
+    sm = plt.cm.ScalarMappable(cmap=cmap,
+                               norm=plt.Normalize(vmin=vmin, vmax=vmax))
+    # # fake up the array of the scalar mappable. Urgh...
+    sm._A = []
+    cbar = plt.colorbar(sm)
+
+    # plt.colorbar(CS2, ax=ax)
 
 
 def tricontourf_dyn(model, sig, ax, cmap, lev, vmin=None, vmax=None):
