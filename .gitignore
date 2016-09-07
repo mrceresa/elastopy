@@ -3,3 +3,4 @@
 /.projectile
 /__pycache__/
 *.pyc
+/elastopy/#statics.py#
