@@ -1,10 +1,14 @@
-import numpy as np
+"""Compute the stress for each node
 
+"""
+import numpy as np
+from elastopy.element import Element
 
 def recovery(model, material, U, EPS0):
     """Recovery stress at nodes from displacement
 
     """
+    # initiate the arrays for element and global stress
     sig = np.zeros(3)
     SIG = np.zeros((model.nn, 3))
 
@@ -13,6 +17,7 @@ def recovery(model, material, U, EPS0):
         EPS0 = np.zeros((model.ne, 3))
 
     for e, conn in enumerate(model.CONN):
+        element = Element(eid, model)
         surf = model.surf_of_ele[e]
         dof = model.DOF[e]
         xyz = model.XYZ[conn]
@@ -32,6 +37,7 @@ def recovery(model, material, U, EPS0):
 
         u = U[dof]
 
+        # quadrature on the nodes coord in the isodomain
         for n, xez in enumerate(model.chi):
             model.basis_function(xez)
             model.jacobian(xyz)

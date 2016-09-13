@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from elastopy import draw
+from elastopy.postprocess import draw
 from elastopy import stress
 import matplotlib.animation as animation
 import numpy as np
