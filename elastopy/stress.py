@@ -2,7 +2,8 @@
 
 """
 import numpy as np
-from elastopy.element import Element
+from elastopy.constructor import constructor
+
 
 def recovery(model, material, U, EPS0):
     """Recovery stress at nodes from displacement
@@ -12,47 +13,39 @@ def recovery(model, material, U, EPS0):
     sig = np.zeros(3)
     SIG = np.zeros((model.nn, 3))
 
-    # correct if EPS0 is not specified
-    if np.size(EPS0) == 1:
-        EPS0 = np.zeros((model.ne, 3))
-
     for e, conn in enumerate(model.CONN):
-        element = Element(eid, model)
-        surf = model.surf_of_ele[e]
-        dof = model.DOF[e]
-        xyz = model.XYZ[conn]
+        element = constructor(e, model, material, EPS0)
+        dof = element.dof
+        xyz = element.xyz
 
-        eps0 = EPS0[e]
+        # if there is no initial strain
+        if EPS0 is None:
+            eps0 = np.zeros(3)
+        else:
+            eps0 = EPS0[e]
 
-        try:
-            E = material.E[surf]
-            nu = material.nu[surf]
-        except:
-            print('Surface {} has no property assigned!'
-                  'Default values were used!'.format(surf))
-            E = 1.0
-            nu = 0.1
+        E = element.E
+        nu = element.nu
 
         C = c_matrix(E, nu)
 
         u = U[dof]
 
         # quadrature on the nodes coord in the isodomain
-        for n, xez in enumerate(model.chi):
-            model.basis_function(xez)
-            model.jacobian(xyz)
+        for n, xez in enumerate(element.chi):
+            _, dN_ei = element.shape_function(xez)
+            dJ, dN_xi, _ = element.jacobian(xyz, dN_ei)
 
             # number of elements sharing a node
             num_ele_shrg = (model.CONN == conn[n]).sum()
 
-            dp_xi = model.dphi_xi
             B = np.array([
-                [dp_xi[0, 0], 0, dp_xi[0, 1], 0, dp_xi[0, 2], 0,
-                 dp_xi[0, 3], 0],
-                [0, dp_xi[1, 0], 0, dp_xi[1, 1], 0, dp_xi[1, 2], 0,
-                 dp_xi[1, 3]],
-                [dp_xi[1, 0], dp_xi[0, 0], dp_xi[1, 1], dp_xi[0, 1],
-                 dp_xi[1, 2], dp_xi[0, 2], dp_xi[1, 3], dp_xi[0, 3]]])
+               [dN_xi[0, 0], 0, dN_xi[0, 1], 0, dN_xi[0, 2], 0,
+                dN_xi[0, 3], 0],
+               [0, dN_xi[1, 0], 0, dN_xi[1, 1], 0, dN_xi[1, 2], 0,
+                dN_xi[1, 3]],
+               [dN_xi[1, 0], dN_xi[0, 0], dN_xi[1, 1], dN_xi[0, 1],
+                dN_xi[1, 2], dN_xi[0, 2], dN_xi[1, 3], dN_xi[0, 3]]])
 
             # sig = [sig_11 sig_22 sig_12] for each n node
             sig = C @ (B @ u - eps0)

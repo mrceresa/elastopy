@@ -1,12 +1,11 @@
 from elastopy import boundary
-from elastopy import stiffness
-from elastopy import load
-from elastopy import traction
 from elastopy import stress
+from elastopy.constructor import constructor
 import numpy as np
 
 
-def solver(model, material, b_force, trac_bc, displ_bc, EPS0=0, t=1):
+def solver(model, material, body_force, traction_bc, displ_bc,
+           EPS0=None, t=1):
     """Solver for the elastostatics problem
 
     Return:
@@ -15,13 +14,23 @@ def solver(model, material, b_force, trac_bc, displ_bc, EPS0=0, t=1):
     SIG: stresses response of the system under the boundary conditions
 
     """
-    K = stiffness.K_matrix(model, material, t)
+    K = np.zeros((model.ndof, model.ndof))
+    Pb = np.zeros(model.ndof)
+    Pt = np.zeros(model.ndof)
+    Pe = np.zeros(model.ndof)
 
-    Pb = load.Pb_vector(model, b_force, t)
+    for eid, type in enumerate(model.TYPE):
+        element = constructor(eid, model, material, EPS0)
 
-    Pt = traction.Pt_vector(model, trac_bc, t)
+        k = element.stiffness_matrix()
+        pb = element.load_body_vector(body_force)
+        pt = element.load_traction_vector(traction_bc)
+        pe = element.load_strain_vector()
 
-    Pe = load.Pe_vector(model, material, EPS0, t)
+        K[element.id_m] += k
+        Pb[element.id_v] += pb
+        Pt[element.id_v] += pt
+        Pe[element.id_v] += pe
 
     P = Pb + Pt + Pe
 

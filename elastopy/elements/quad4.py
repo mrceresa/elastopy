@@ -1,22 +1,48 @@
 """Module for quad element with 4 nodes - type 3 in gmsh
 
 """
+from elastopy.element import Element
 import numpy as np
 
 
-class Quad4(object):
+class Quad4(Element):
     """Constructor of a 4-node quadrangle (TYPE 3) element
 
     """
-    def __init__(self, element):
-        # get element basic attributes
-        self.__dict__.update(element.__dict__)
+    def __init__(self, eid, model, material, EPS0):
+
+        super().__init__(eid, model)
 
         # Nodal coordinates in the natural domain (isoparametric coordinates)
         self.chi = np.array([[-1.0, -1.0],
                              [1.0, -1.0],
                              [1.0, 1.0],
                              [-1.0, 1.0]])
+
+        try:
+            self.E = material.E[self.surf]
+            self.nu = material.nu[self.surf]
+        except AttributeError:
+            print('E and nu must be defined for all surfaces! (Default used)')
+        except KeyError:
+            print('Surface ', self.surf,
+                  ' with no material assigned! (Default used)')
+        finally:
+            self.E = 1e6
+            self.nu = 0.2
+
+        if EPS0 is None:
+            self.eps0 = np.zeros(3)
+
+        # check if its a boundary element
+        if eid in model.bound_ele[:, 0]:
+            # side of the element at the boundary
+            self.side_at_boundary = model.bound_ele[eid, 1]
+            # boundary line where the element side share interface
+            self.at_boundary_line = model.bound_ele[eid, 2]
+        else:
+            self.side_at_boundary = None
+            self.at_boundary_line = None
 
     def shape_function(self, xez):
         """Create the basis function and its properties.
@@ -44,11 +70,11 @@ class Quad4(object):
         # Derivative of the shape functions
         # dN = [ dN1_e1 dN2_e1 ...
         #         dN1_e2 dN2_e2 ... ]
-        dN_ei = np.zeros((2, 4))
-        dN_ei[0, :] = 0.5 * self.chi[:, 0] * e2_term
-        dN_ei[1, :] = 0.5 * self.chi[:, 1] * e1_term
+        self.dN_ei = np.zeros((2, 4))
+        self.dN_ei[0, :] = 0.5 * self.chi[:, 0] * e2_term
+        self.dN_ei[1, :] = 0.5 * self.chi[:, 1] * e1_term
 
-        return N, dN_ei
+        return self.N, self.dN_ei
 
     def mapping(self, xyz):
         """maps from cartesian to isoparametric.
@@ -91,19 +117,13 @@ class Quad4(object):
         ])
         return det_jac, dN_xi, arch_length
 
-    def stiffness(self, material, t=1):
+    def stiffness_matrix(self, t=1):
         """Build the element stiffness matrix
 
         """
-        try:
-            E = material.E[self.surf]
-            nu = material.nu[self.surf]
-        except:
-            raise Exception('Material not assigned for surface!')
-
         k = np.zeros((8, 8))
 
-        C = self.c_matrix(E, nu, t)
+        C = self.c_matrix(t)
 
         gauss_points = self.chi / np.sqrt(3.0)
 
@@ -123,22 +143,21 @@ class Quad4(object):
 
         return k
 
-    @staticmethod
-    def c_matrix(E, nu, t=1):
+    def c_matrix(self, t=1):
         """Build the element constitutive matrix
 
         """
-        C = np.zeros((3, 3))
-        C[0, 0] = 1.0
-        C[1, 1] = 1.0
-        C[1, 0] = nu
-        C[0, 1] = nu
-        C[2, 2] = (1.0 - nu)/2.0
-        C = (E/(1.0-nu**2.0))*C
+        self.C = np.zeros((3, 3))
+        self.C[0, 0] = 1.0
+        self.C[1, 1] = 1.0
+        self.C[1, 0] = self.nu
+        self.C[0, 1] = self.nu
+        self.C[2, 2] = (1.0 - self.nu)/2.0
+        self.C = (self.E/(1.0 - self.nu**2.0))*self.C
 
-        return C
+        return self.C
 
-    def body_load(self, b_force, t=1):
+    def load_body_vector(self, b_force, t=1):
         """Build the element vector due body forces b_force
 
         """
@@ -162,17 +181,11 @@ class Quad4(object):
 
         return pb
 
-    def initial_strain_load(self, material, eps0, t=1):
+    def load_strain_vector(self, t=1):
         """Build the element vector due initial strain
 
         """
-        try:
-            E = material.E[self.surf]
-            nu = material.nu[self.surf]
-        except:
-            raise Exception('Material not assigned for surface!')
-
-        C = self.c_matrix(E, nu, t)
+        C = self.c_matrix(t)
 
         gauss_points = self.chi / np.sqrt(3.0)
 
@@ -189,16 +202,14 @@ class Quad4(object):
                 [dN_xi[1, 0], dN_xi[0, 0], dN_xi[1, 1], dN_xi[0, 1],
                  dN_xi[1, 2], dN_xi[0, 2], dN_xi[1, 3], dN_xi[0, 3]]])
 
-            pe += (B.T @ C @ eps0)*dJ
+            pe += (B.T @ C @ self.eps0)*dJ
 
         return pe
 
-    def traction_load(self, side, line, f, t=1):
-        """Build element load vector due traction boundary condition
+    def load_traction_vector(self, traction_bc, t=1):
+        """Build element load vector due traction_bction boundary condition
 
         """
-        pt = np.zeros(4)
-
         gp = np.array([
             [[-1.0/np.sqrt(3), -1.0],
              [1.0/np.sqrt(3), -1.0]],
@@ -209,13 +220,35 @@ class Quad4(object):
             [[-1.0, -1.0/np.sqrt(3)],
              [-1.0, 1/np.sqrt(3)]]])
 
-        for w in range(2):
-            N, dN_ei = self.shape_function(xez=gp[side, w])
-            _, _, arch_length = self.jacobian(self.xyz, dN_ei)
+        pt = np.zeros(8)
 
-            dL = arch_length[side]
-            x1, x2 = self.mapping(xyz)
+        for key in traction_bc(1, 1).keys():
+            line = key[1]
 
-            pt += N[:]*f(x1, x2, t)[line]*dL
+            # Check if this element is at the line with traction
+            if line == self.at_boundary_line:
+
+                side = self.side_of_ele_at_bound
+
+                # perform the integral with GQ
+                for w in range(2):
+                    N, dN_ei = self.shape_function(xez=gp[side, w])
+                    _, _, arch_length = self.jacobian(self.xyz, dN_ei)
+
+                    dL = arch_length[side]
+                    x1, x2 = self.mapping(self.xyz)
+
+                    pt[0] += N[0] * traction_bc(x1, x2, t)[key][0] * dL
+                    pt[1] += N[0] * traction_bc(x1, x2, t)[key][1] * dL
+                    pt[2] += N[1] * traction_bc(x1, x2, t)[key][0] * dL
+                    pt[3] += N[1] * traction_bc(x1, x2, t)[key][1] * dL
+                    pt[4] += N[2] * traction_bc(x1, x2, t)[key][0] * dL
+                    pt[5] += N[2] * traction_bc(x1, x2, t)[key][1] * dL
+                    pt[6] += N[3] * traction_bc(x1, x2, t)[key][0] * dL
+                    pt[7] += N[3] * traction_bc(x1, x2, t)[key][1] * dL
+
+            else:
+                # Catch element that is not at boundary
+                continue
 
         return pt
