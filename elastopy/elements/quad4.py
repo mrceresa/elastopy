@@ -14,7 +14,7 @@ class Quad4(Element):
         super().__init__(eid, model)
 
         # Nodal coordinates in the natural domain (isoparametric coordinates)
-        self.chi = np.array([[-1.0, -1.0],
+        self.XEZ = np.array([[-1.0, -1.0],
                              [1.0, -1.0],
                              [1.0, 1.0],
                              [-1.0, 1.0]])
@@ -45,13 +45,13 @@ class Quad4(Element):
             self.at_boundary_line = None
 
     def shape_function(self, xez):
-        """Create the basis function and its properties.
+        """Create the basis function and evaluate them at xez coordinates
 
         Args:
-        xez(array) : position in the isoparametric coordinate xi, eta, zeta
+            xez (array): position in the isoparametric coordinate xi, eta, zeta
 
         Return:
-        N (array): shape functions
+            N (array): shape functions
 
         """
         # variables in the natural (iso-parametric) domain
@@ -59,11 +59,11 @@ class Quad4(Element):
         e2 = xez[1]
 
         # Terms of the shape function
-        e1_term = 0.5*(1.0 + self.chi[:, 0] * e1)
-        e2_term = 0.5*(1.0 + self.chi[:, 1] * e2)
+        e1_term = 0.5*(1.0 + self.XEZ[:, 0] * e1)
+        e2_term = 0.5*(1.0 + self.XEZ[:, 1] * e2)
 
         # Basis functions
-        # N = [ N_1 N_2 N_3 N4 ]
+        # N = [ N_1 N_2 N_3 N_4 ]
         N = e1_term*e2_term
         self.N = np.array(N)
 
@@ -71,8 +71,8 @@ class Quad4(Element):
         # dN = [ dN1_e1 dN2_e1 ...
         #         dN1_e2 dN2_e2 ... ]
         self.dN_ei = np.zeros((2, 4))
-        self.dN_ei[0, :] = 0.5 * self.chi[:, 0] * e2_term
-        self.dN_ei[1, :] = 0.5 * self.chi[:, 1] * e1_term
+        self.dN_ei[0, :] = 0.5 * self.XEZ[:, 0] * e2_term
+        self.dN_ei[1, :] = 0.5 * self.XEZ[:, 1] * e1_term
 
         return self.N, self.dN_ei
 
@@ -86,13 +86,22 @@ class Quad4(Element):
     def jacobian(self, xyz, dN_ei):
         """Creates the Jacobian matrix of the mapping between an element
 
+        Args:
+            xyz (array of floats): coordinates of element nodes in cartesian coordinates
+            dN_ei (array of floats): derivative of shape functions
+
+        Return:
+            det_jac (float): determinant of the jacobian matrix
+            dN_xi (array of floats): derivative of shape function wrt cartesian system
+            arch_length (array of floats): arch length for change of variable in the line integral
+
         """
         # Jac = [ x1_e1 x2_e1
         #         x1_e2 x2_e2 ]
         Jac = np.dot(dN_ei, xyz)
 
         det_jac = ((Jac[0, 0]*Jac[1, 1] -
-                   Jac[0, 1]*Jac[1, 0]))
+                    Jac[0, 1]*Jac[1, 0]))
 
         # jac_inv = [ e1_x1 e2_x1
         #            e1_x2 e2_x2 ]
@@ -125,7 +134,7 @@ class Quad4(Element):
 
         C = self.c_matrix(t)
 
-        gauss_points = self.chi / np.sqrt(3.0)
+        gauss_points = self.XEZ / np.sqrt(3.0)
 
         for gp in gauss_points:
             _, dN_ei = self.shape_function(xez=gp)
@@ -161,7 +170,7 @@ class Quad4(Element):
         """Build the element vector due body forces b_force
 
         """
-        gauss_points = self.chi / np.sqrt(3.0)
+        gauss_points = self.XEZ / np.sqrt(3.0)
 
         pb = np.zeros(8)
         for gp in gauss_points:
@@ -187,7 +196,7 @@ class Quad4(Element):
         """
         C = self.c_matrix(t)
 
-        gauss_points = self.chi / np.sqrt(3.0)
+        gauss_points = self.XEZ / np.sqrt(3.0)
 
         pe = np.zeros(8)
         for gp in gauss_points:
