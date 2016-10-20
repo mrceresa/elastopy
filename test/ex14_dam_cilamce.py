@@ -35,7 +35,7 @@ material.E[s[1]] = 28e+9      # Leger1993
 material.nu[s[1]] = 0.33        # Leger1993
 material.spcfht[s[1]] = 840     # Leger1993
 
-g = 9.8
+g = 9.81
 
 
 def b_force(x1, x2, t=1):
@@ -115,8 +115,8 @@ PLOT SENOIDAL CURVE
 # plt.show()
 
 
-T0 = 10
-t_int = 60*60*24*5             # Interval
+T0 = 20
+t_int = 60*60*24*2             # Interval
 dt = t_int/10
 
 
@@ -169,10 +169,13 @@ plt.show()
 """
 PLOT SPMAX, SPMIN, T AND U FIELD AT SPECIFIC TIMES
 """
-time = [1, 5, 12, 24, 24*2, 24*4]
+time = [0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 44]  # in [h]
 
+
+T_point = []
+time_point = []
 for ti in time:
-    time_index = int((t_int/dt)/24*ti)
+    time_index = int((t_int/dt)/t_int*(60*60*ti))
 
     """
     PRINCIPAL STRESS MAXIMUM
@@ -180,10 +183,9 @@ for ti in time:
     # spmax = stress.principal_max(SIG[:, 0, time_index],
     #                              SIG[:, 1, time_index],
     #                              SIG[:, 2, time_index])
-    # print(np.amax(spmax), np.amin(spmax))
+    # print(np.amax(spmax)/1e6, np.amin(spmax)/1e6)
     # plotter.stresses(model, SIG[:, :, time_index], ftr=1e6, spmax=True,
-    #                  vmin=-3.5, vmax=2.5, lev=20)
-    # plt.gca().set_title('Time: '+str(ti)+'h')
+    #                  vmin=-5.9, vmax=5.5, lev=20, title='Time: '+str(ti)+'h')
 
     """
     PRINCIPAL STRESS MINIMUM
@@ -191,22 +193,33 @@ for ti in time:
     # spmin = stress.principal_min(SIG[:, 0, time_index],
     #                              SIG[:, 1, time_index],
     #                              SIG[:, 2, time_index])
-    # print(np.amax(spmin), np.amin(spmin))
+    # print(np.amax(spmin)/1e6, np.amin(spmin)/1e6)
     # plotter.stresses(model, SIG[:, :, time_index], ftr=1e6, spmin=True,
-    #                  vmin=-8.3, vmax=-1.2, lev=20)
-    # plt.gca().set_title('Time: '+str(ti)+'h')
+    #                  vmin=-12.2, vmax=0, lev=20, title='Time: '+str(ti)+'h')
 
     # DISPLACEMENT
-    plotter.model_deformed(model, U[:, time_index], magf=1000, color='k',
-                           ele=True)
+    plotter.model_deformed(model, U[:, time_index], magf=1000, color='r')
     plt.gca().set_title('Time: '+str(ti)+'h')
 
     # # TEMPERATURE
-    T = steadystate.solver(model, material, b_heat, flux_bc,
-                           temp_bc, t=ti*60*60)
-    plottert.contour(model, T, title='Time: '+str(ti)+'h', vmin=0, vmax=90)
+    # T = steadystate.solver(model, material, b_heat, flux_bc,
+    #                        temp_bc, t=ti*60*60)
+  #   T_point.append(T[105])
+#     time_point.append(ti)
+#     plottert.contour(model, T, title='Time: '+str(ti)+'h', vmin=0, vmax=90)
+
+    plt.savefig('displ'+str(ti)+'h.pdf', bbox_inches='tight')
+
+# fig, ax = plt.subplots()
+# ax.plot(time_point, T_point, '-b')
+# ax.set_xlabel('Time (h)')
+# ax.set_ylabel('Temperature (C)')
+# plt.savefig('T_evo.pdf', bbox_inches='tight')
 
 plt.show()
+
+
+
 
 """
 PLOT ANIMATIONS OF STRESS AND DISPLACEMENT
@@ -215,5 +228,5 @@ PLOT ANIMATIONS OF STRESS AND DISPLACEMENT
 #                          name="stre-cilamce1.gif", vmin=-50, vmax=150,
 #                          interval=100, ftr=1e6)
 
-# plotter.displ_animation(U, model, t_int, dt, name='displ-cilamce1.gif', magf=100,
+# plotter.displ_animation(U, model, t_int, dt, name='00-displ.gif', magf=100,
 #                         interval=100)

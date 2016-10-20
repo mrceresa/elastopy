@@ -353,7 +353,8 @@ def draw_bc_neumann_value(traction, model, name, dpi):
                                                  headwidth=5, shrink=0.1))
 
 
-def tricontourf(model, sig, ax, cmap, lev, vmin=None, vmax=None):
+def tricontourf(model, sig, ax, cmap, lev, vmin=None, vmax=None,
+                cbar_label=''):
     """Plot contour with the tricoutour function and the boundary line with
     the boundary node.
 
@@ -390,6 +391,7 @@ def tricontourf(model, sig, ax, cmap, lev, vmin=None, vmax=None):
     # # fake up the array of the scalar mappable. Urgh...
     sm._A = []
     cbar = plt.colorbar(sm)
+    cbar.set_label(cbar_label)
 
     # plt.colorbar(CS2, ax=ax)
 
