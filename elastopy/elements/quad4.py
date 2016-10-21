@@ -237,7 +237,7 @@ class Quad4(Element):
             # Check if this element is at the line with traction
             if line == self.at_boundary_line:
 
-                side = self.side_of_ele_at_bound
+                side = self.side_at_boundary
 
                 # perform the integral with GQ
                 for w in range(2):

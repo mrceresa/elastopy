@@ -32,7 +32,7 @@ def recovery(model, material, U, EPS0):
         u = U[dof]
 
         # quadrature on the nodes coord in the isodomain
-        for n, xez in enumerate(element.chi):
+        for n, xez in enumerate(element.XEZ):
             _, dN_ei = element.shape_function(xez)
             dJ, dN_xi, _ = element.jacobian(xyz, dN_ei)
 

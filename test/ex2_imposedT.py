@@ -1,17 +1,17 @@
 import numpy as np
-from elastopy import statics
-from elastopy import gmsh
-from elastopy import plotter
-from elastopy import data
+from elastopy.model import Build
+from elastopy.mesh import gmsh
+from elastopy.material import Material
+from elastopy.solvers import statics
+from elastopy.postprocess import plotter
 
-mesh_name = 'patch'
+mesh_file = 'patch'
 
-model = gmsh.Parse(mesh_name)
+mesh = gmsh.Parse(mesh_file)
 
-material = data.Collect()
+model = Build(mesh)
 
-material.E[9] = 1000
-material.nu[9] = 0.3
+material = Material(E={9: 1000}, nu={9: 0.3})
 
 
 def b_force(x1, x2, t=1):
@@ -34,7 +34,7 @@ U, SIG = statics.solver(model, material, b_force,
 
 plotter.model(model, ele=True, nodes_label=True,
               ele_label=True, edges_label=True)
-plotter.model_deformed(model, U, magf=100, ele=True)
+plotter.model_deformed(model, U, magf=1000, ele=True)
 
 
 plotter.show()
