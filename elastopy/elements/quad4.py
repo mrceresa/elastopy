@@ -231,6 +231,7 @@ class Quad4(Element):
 
         pt = np.zeros(8)
 
+        # loop for specified boundary conditions
         for key in traction_bc(1, 1).keys():
             line = key[1]
 
