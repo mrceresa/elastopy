@@ -36,10 +36,16 @@ class Quad4(Element):
 
         # check if its a boundary element
         if eid in model.bound_ele[:, 0]:
+
+            # index where bound_ele refers to this element
+            index = np.where(model.bound_ele[:, 0] == eid)[0]
+
             # side of the element at the boundary
-            self.side_at_boundary = model.bound_ele[eid, 1]
+            self.side_at_boundary = model.bound_ele[index, 1]
+
             # boundary line where the element side share interface
-            self.at_boundary_line = model.bound_ele[eid, 2]
+            self.at_boundary_line = model.bound_ele[index, 2]
+
         else:
             self.side_at_boundary = None
             self.at_boundary_line = None
@@ -87,18 +93,20 @@ class Quad4(Element):
         """Creates the Jacobian matrix of the mapping between an element
 
         Args:
-            xyz (array of floats): coordinates of element nodes in cartesian coordinates
-            dN_ei (array of floats): derivative of shape functions
+        xyz (array of floats): coordinates of element nodes in cartesian
+        coordinates
+        dN_ei (array of floats): derivative of shape functions
 
         Return:
-            det_jac (float): determinant of the jacobian matrix
-            dN_xi (array of floats): derivative of shape function wrt cartesian system
-            arch_length (array of floats): arch length for change of variable in the line integral
-
+        det_jac (float): determinant of the jacobian matrix
+        dN_xi (array of floats): derivative of shape function
+        with respect to cartesian system
+        arch_length (array of floats): arch length for change of variable
+        in the line integral
         """
         # Jac = [ x1_e1 x2_e1
         #         x1_e2 x2_e2 ]
-        Jac = np.dot(dN_ei, xyz)
+        Jac = dN_ei @ xyz
 
         det_jac = ((Jac[0, 0]*Jac[1, 1] -
                     Jac[0, 1]*Jac[1, 0]))
@@ -119,10 +127,10 @@ class Quad4(Element):
         # Length of the transofmation arch
         # Jacobian for line integral-2.
         arch_length = np.array([
-            (Jac[0, 0]**2. + Jac[0, 1]**2.)**(1./2.),
-            (Jac[1, 0]**2. + Jac[1, 1]**2.)**(1./2.),
-            (Jac[0, 0]**2. + Jac[0, 1]**2.)**(1./2.),
-            (Jac[1, 0]**2. + Jac[1, 1]**2.)**(1./2.)
+            (Jac[0, 0]**2 + Jac[0, 1]**2)**(1/2),
+            (Jac[1, 0]**2 + Jac[1, 1]**2)**(1/2),
+            (Jac[0, 0]**2 + Jac[0, 1]**2)**(1/2),
+            (Jac[1, 0]**2 + Jac[1, 1]**2)**(1/2)
         ])
         return det_jac, dN_xi, arch_length
 
@@ -147,7 +155,9 @@ class Quad4(Element):
                  dN_xi[1, 3]],
                 [dN_xi[1, 0], dN_xi[0, 0], dN_xi[1, 1], dN_xi[0, 1],
                  dN_xi[1, 2], dN_xi[0, 2], dN_xi[1, 3], dN_xi[0, 3]]])
-
+            print('element', self.eid)
+            print('det jac', dJ)
+            print('B matrix', B)
             k += (B.T @ C @ B)*dJ
 
         return k
@@ -235,30 +245,30 @@ class Quad4(Element):
         for key in traction_bc(1, 1).keys():
             line = key[1]
 
-            # Check if this element is at the line with traction
-            if line == self.at_boundary_line:
+            for ele_boundary_line, ele_side in zip(self.at_boundary_line,
+                                                   self.side_at_boundary):
+                # Check if this element is at the line with traction
+                if line == ele_boundary_line:
 
-                side = self.side_at_boundary
+                    # perform the integral with GQ
+                    for w in range(2):
+                        N, dN_ei = self.shape_function(xez=gp[ele_side, w])
+                        _, _, arch_length = self.jacobian(self.xyz, dN_ei)
+                        
+                        dL = arch_length[ele_side]
+                        x1, x2 = self.mapping(self.xyz)
 
-                # perform the integral with GQ
-                for w in range(2):
-                    N, dN_ei = self.shape_function(xez=gp[side, w])
-                    _, _, arch_length = self.jacobian(self.xyz, dN_ei)
+                        pt[0] += N[0] * traction_bc(x1, x2, t)[key][0] * dL
+                        pt[1] += N[0] * traction_bc(x1, x2, t)[key][1] * dL
+                        pt[2] += N[1] * traction_bc(x1, x2, t)[key][0] * dL
+                        pt[3] += N[1] * traction_bc(x1, x2, t)[key][1] * dL
+                        pt[4] += N[2] * traction_bc(x1, x2, t)[key][0] * dL
+                        pt[5] += N[2] * traction_bc(x1, x2, t)[key][1] * dL
+                        pt[6] += N[3] * traction_bc(x1, x2, t)[key][0] * dL
+                        pt[7] += N[3] * traction_bc(x1, x2, t)[key][1] * dL
 
-                    dL = arch_length[side]
-                    x1, x2 = self.mapping(self.xyz)
-
-                    pt[0] += N[0] * traction_bc(x1, x2, t)[key][0] * dL
-                    pt[1] += N[0] * traction_bc(x1, x2, t)[key][1] * dL
-                    pt[2] += N[1] * traction_bc(x1, x2, t)[key][0] * dL
-                    pt[3] += N[1] * traction_bc(x1, x2, t)[key][1] * dL
-                    pt[4] += N[2] * traction_bc(x1, x2, t)[key][0] * dL
-                    pt[5] += N[2] * traction_bc(x1, x2, t)[key][1] * dL
-                    pt[6] += N[3] * traction_bc(x1, x2, t)[key][0] * dL
-                    pt[7] += N[3] * traction_bc(x1, x2, t)[key][1] * dL
-
-            else:
-                # Catch element that is not at boundary
-                continue
+                else:
+                    # Catch element that is not at boundary
+                    continue
 
         return pt

@@ -9,6 +9,7 @@ class Element(object):
 
     """
     def __init__(self, eid, model):
+        self.eid = eid
         self.type = model.TYPE[eid]
         self.conn = model.CONN[eid]
         self.xyz = model.XYZ[self.conn]
