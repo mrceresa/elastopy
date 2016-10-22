@@ -27,9 +27,6 @@ class Quad4(Element):
         except KeyError:
             print('Surface ', self.surf,
                   ' with no material assigned! (Default used)')
-        finally:
-            self.E = 1e6
-            self.nu = 0.2
 
         if EPS0 is None:
             self.eps0 = np.zeros(3)
@@ -155,9 +152,7 @@ class Quad4(Element):
                  dN_xi[1, 3]],
                 [dN_xi[1, 0], dN_xi[0, 0], dN_xi[1, 1], dN_xi[0, 1],
                  dN_xi[1, 2], dN_xi[0, 2], dN_xi[1, 3], dN_xi[0, 3]]])
-            print('element', self.eid)
-            print('det jac', dJ)
-            print('B matrix', B)
+
             k += (B.T @ C @ B)*dJ
 
         return k

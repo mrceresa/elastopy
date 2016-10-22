@@ -33,7 +33,7 @@ def solver(model, material, body_force, traction_bc, displ_bc,
         Pe[element.id_v] += pe
 
     P = Pb + Pt + Pe
-    print(K[:, 1], K[1, :])
+
     Km, Pm = boundary.dirichlet(K, P, model, displ_bc)
 
     U = np.linalg.solve(Km, Pm)
