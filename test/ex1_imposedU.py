@@ -28,11 +28,12 @@ def displacement_imposed(x1, x2):
         ('nodes', 4, 6): [0.5, 0.0],
         ('nodes', 1, 5, 2): [1.0, 0.0]}
 
-
 U, SIG = statics.solver(model, material, body_forces,
                         traction_imposed, displacement_imposed)
 
-plotter.model(model)
-plotter.model_deformed(model, U, magf=0.1)
+plotter.model(model, ele=True, nodes_label=True, edges_label=True,
+              ele_label=True)
+plotter.model_deformed(model, U, magf=0.1, ele=True)
+print(SIG[:, 0])
 
 plotter.show()

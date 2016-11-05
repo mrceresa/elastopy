@@ -6,11 +6,8 @@ from elastopy.solvers import statics
 from elastopy.postprocess import plotter
 
 mesh_file = 'patch'
-
 mesh = gmsh.Parse(mesh_file)
-
 model = Build(mesh)
-
 material = Material(E={9: 1000}, nu={9: 0.3})
 
 
@@ -35,6 +32,4 @@ U, SIG = statics.solver(model, material, b_force,
 plotter.model(model, ele=True, nodes_label=True,
               ele_label=True, edges_label=True)
 plotter.model_deformed(model, U, magf=100, ele=True)
-
-
 plotter.show()
