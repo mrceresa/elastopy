@@ -157,6 +157,13 @@ class Quad4(Element):
 
         return k
 
+    def mass_matrix(self, t=1):
+        """Build element mass matrix
+
+        """
+        return None
+        
+
     def c_matrix(self, t=1):
         """Build the element constitutive matrix
 
