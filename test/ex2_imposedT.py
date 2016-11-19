@@ -18,13 +18,13 @@ def b_force(x1, x2, t=1):
 
 def trac_bc(x1, x2, t=1):
     return {
-        ('line', 3): [-1.0, 0.0],
-        ('line', 1): [1.0, 0.0]}
+        ('line', 3): [-1, 0],
+        ('line', 1): [1, 0]}
 
 
 def displ_bc(x1, x2):
-    return {('node', 0): [0.0, 0.0],
-            ('node', 1): ['free', 0.0]}
+    return {('node', 0): [0, 0],
+            ('node', 1): ['free', 0]}
 
 U, SIG = statics.solver(model, material, b_force,
                         trac_bc, displ_bc)

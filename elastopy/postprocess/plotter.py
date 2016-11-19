@@ -65,7 +65,7 @@ def model_deformed(model, U, magf=1, ele=False, name=None, color='Tomato',
         draw.deformed_elements(model, U, ax, magf=magf, color=color)
 
     draw.domain(model, ax, color='SteelBlue')
-    draw.deformed_domain(model, U, ax, magf=magf, color=color)
+    # draw.deformed_domain(model, U, ax, magf=magf, color=color)
 
 
 def stresses(model, SIG, ftr=1, s11=False, s12=False, s22=False, spmax=False,

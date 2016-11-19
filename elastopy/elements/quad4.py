@@ -105,8 +105,8 @@ class Quad4(Element):
         #         x1_e2 x2_e2 ]
         Jac = dN_ei @ xyz
 
-        det_jac = ((Jac[0, 0]*Jac[1, 1] -
-                    Jac[0, 1]*Jac[1, 0]))
+        det_jac = abs((Jac[0, 0]*Jac[1, 1] -
+                       Jac[0, 1]*Jac[1, 0]))
 
         # jac_inv = [ e1_x1 e2_x1
         #            e1_x2 e2_x2 ]

@@ -56,6 +56,7 @@ def dirichlet(K, F, model, displ_bc):
                     ry = displ_bc(1, 1)[line][1]
 
                     # nodes indexes on the element boundary line
+
                     n1 = model.nodes_in_bound_line[n, 1]
                     n2 = model.nodes_in_bound_line[n, 2]
 

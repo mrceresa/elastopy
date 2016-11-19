@@ -218,7 +218,6 @@ def deformed_domain(model, U, ax, magf, color):
 
     """
     c = model.XYZ
-
     bn = model.nodes_in_bound_line
 
     adX = U[::2]
@@ -226,7 +225,6 @@ def deformed_domain(model, U, ax, magf, color):
 
     dX, dY = (c[bn[:, 1], 0] + adX[bn[:, 1]]*magf,
               c[bn[:, 1], 1] + adY[bn[:, 1]]*magf)
-
     G2 = nx.Graph()
 
     label2 = []
@@ -241,7 +239,7 @@ def deformed_domain(model, U, ax, magf, color):
 
     positions2 = nx.get_node_attributes(G2, 'posxy2')
 
-    nx.draw_networkx(G2, positions2, node_size=0, edge_color=color,
+    nx.draw_networkx_edges(G2, positions2, edge_color=color,
                      font_size=0, width=1, ax=ax)
 
 
