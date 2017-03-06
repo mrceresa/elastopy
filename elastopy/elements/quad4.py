@@ -243,6 +243,9 @@ class Quad4(Element):
 
         pt = np.zeros(8)
 
+        if(self.at_boundary_line is None) or (self.side_at_boundary is None):
+          return pt
+
         # loop for specified boundary conditions
         for key in traction_bc(1, 1).keys():
             line = key[1]
